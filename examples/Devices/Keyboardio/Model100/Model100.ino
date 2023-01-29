@@ -10,21 +10,8 @@
 // The Kaleidoscope core
 #include "Kaleidoscope.h"
 
-// Support for storing the keymap in EEPROM
-#include "Kaleidoscope-EEPROM-Settings.h"
-#include "Kaleidoscope-EEPROM-Keymap.h"
-
-// Support for communicating with the host via a simple Serial protocol
-#include "Kaleidoscope-FocusSerial.h"
-
-// Support for querying the firmware version via Focus
-#include "Kaleidoscope-FirmwareVersion.h"
-
 // Support for keys that move the mouse
 #include "Kaleidoscope-MouseKeys.h"
-
-// Support for macros
-#include "Kaleidoscope-Macros.h"
 
 // Support for controlling the keyboard's LEDs
 #include "Kaleidoscope-LEDControl.h"
@@ -75,49 +62,11 @@
 // Support for host power management (suspend & wakeup)
 #include "Kaleidoscope-HostPowerManagement.h"
 
-// Support for magic combos (key chords that trigger an action)
-#include "Kaleidoscope-MagicCombo.h"
-
 // Support for USB quirks, like changing the key state report protocol
 #include "Kaleidoscope-USB-Quirks.h"
 
 // Support for secondary actions on keys
 #include "Kaleidoscope-Qukeys.h"
-
-// Support for one-shot modifiers and layer keys
-#include "Kaleidoscope-OneShot.h"
-#include "Kaleidoscope-Escape-OneShot.h"
-
-// Support for dynamic, Chrysalis-editable macros
-#include "Kaleidoscope-DynamicMacros.h"
-
-// Support for SpaceCadet keys
-#include "Kaleidoscope-SpaceCadet.h"
-
-// Support for editable layer names
-#include "Kaleidoscope-LayerNames.h"
-
-// Support for the GeminiPR Stenography protocol
-#include "Kaleidoscope-Steno.h"
-
-/** This 'enum' is a list of all the macros used by the Model 100's firmware
-  * The names aren't particularly important. What is important is that each
-  * is unique.
-  *
-  * These are the names of your macros. They'll be used in two places.
-  * The first is in your keymap definitions. There, you'll use the syntax
-  * `M(MACRO_NAME)` to mark a specific keymap position as triggering `MACRO_NAME`
-  *
-  * The second usage is in the 'switch' statement in the `macroAction` function.
-  * That switch statement actually runs the code associated with a macro when
-  * a macro key is pressed.
-  */
-
-enum {
-  MACRO_VERSION_INFO,
-  MACRO_ANY,
-};
-
 
 /** The Model 100's key layouts are defined as 'keymaps'. By default, there are three
   * keymaps: The standard QWERTY keymap, the "Function layer" keymap and the "Numpad"
@@ -168,30 +117,35 @@ enum {
   */
 
 enum {
-  PRIMARY,
-  NUMPAD,
-  FUNCTION,
-};  // layers
+  QWERTY,
+  MEDIA,
+  NAV,
+  MOUSE,
+  SYMBOL,
+  NUMBER,
+  FUNCTION
+}; // layers
 
 
-/**
-  * To change your keyboard's layout from QWERTY to DVORAK or COLEMAK, comment out the line
-  *
-  * #define PRIMARY_KEYMAP_QWERTY
-  *
-  * by changing it to
-  *
-  * // #define PRIMARY_KEYMAP_QWERTY
-  *
-  * Then uncomment the line corresponding to the layout you want to use.
-  *
-  */
+#define Key_Excl        LSHIFT(Key_1)
+#define Key_At          LSHIFT(Key_2)
+#define Key_Hash        LSHIFT(Key_3)
+#define Key_Dollar      LSHIFT(Key_4)
+#define Key_Pct         LSHIFT(Key_5)
+#define Key_Caret       LSHIFT(Key_6)
+#define Key_Amp         LSHIFT(Key_7)
+#define Key_Star        LSHIFT(Key_8)
+#define Key_Plus        LSHIFT(Key_Equals)
 
-#define PRIMARY_KEYMAP_QWERTY
-// #define PRIMARY_KEYMAP_DVORAK
-// #define PRIMARY_KEYMAP_COLEMAK
-// #define PRIMARY_KEYMAP_CUSTOM
+#define C_Prev Consumer_ScanPreviousTrack
+#define C_Next Consumer_ScanNextTrack
+#define C_VolUp Consumer_VolumeIncrement
+#define C_VolDn Consumer_VolumeDecrement
+#define C_Stop Consumer_Stop
+#define C_PP Consumer_PlaySlashPause
+#define C_Mute Consumer_Mute
 
+#define MO(n) ShiftToLayer(n)
 
 /* This comment temporarily turns off astyle's indent enforcement
  *   so we can make the keymaps actually resemble the physical key layout better
@@ -199,10 +153,8 @@ enum {
 // clang-format off
 
 KEYMAPS(
-
-#if defined (PRIMARY_KEYMAP_QWERTY)
-  [PRIMARY] = KEYMAP_STACKED
-  (___,          Key_1, Key_2, Key_3, Key_4, Key_5, Key_LEDEffectNext,
+  [QWERTY] = KEYMAP_STACKED
+  (___   ,Key_1                 , Key_2, Key_3, Key_4, Key_5, Key_LEDEffectNext,
    Key_Backtick, Key_Q, Key_W, Key_E, Key_R, Key_T, Key_Tab,
    Key_PageUp,   Key_A, Key_S, Key_D, Key_F, Key_G,
    Key_PageDown, Key_Z, Key_X, Key_C, Key_V, Key_B, Key_Escape,
@@ -216,94 +168,97 @@ KEYMAPS(
    Key_RightShift, Key_LeftAlt, Key_Spacebar, Key_RightControl,
    ShiftToLayer(FUNCTION)),
 
-#elif defined (PRIMARY_KEYMAP_DVORAK)
+  [QWERTY] = KEYMAP_STACKED
+  (
+       ___      ,___          ,___          ,___          ,___          ,___          ,___
+      ,___      ,Key_Q        ,Key_W        ,Key_E        ,Key_R        ,Key_T        ,Key_LEDEffectNext
+      ,___      ,Key_A        ,Key_S        ,Key_D        ,Key_F        ,Key_G
+      ,___      ,Key_Z        ,Key_X        ,Key_C        ,Key_V        ,Key_B        ,___
+      ,___      ,MO(MEDIA)    ,MO(NAV)      ,MO(MOUSE)    ,___
+                                
+                              ,Key_Y                     ,Key_U                    ,Key_I        ,Key_O        ,Key_P
+                              ,Key_H                     ,SFT_T(J)             ,CTL_T(K) ,ALT_T(L) ,GUI_T(Quote)
+       ,___                   ,Key_N                     ,Key_M                    ,Key_Comma    ,Key_Period   ,Key_Slash
+       ,___     ,MO(SYMBOL)  ,MO(NUMBER)      ,MO(FUNCTION) ,___          ,___          ,___
+  ),
 
-  [PRIMARY] = KEYMAP_STACKED
-  (___,          Key_1,         Key_2,     Key_3,      Key_4, Key_5, Key_LEDEffectNext,
-   Key_Backtick, Key_Quote,     Key_Comma, Key_Period, Key_P, Key_Y, Key_Tab,
-   Key_PageUp,   Key_A,         Key_O,     Key_E,      Key_U, Key_I,
-   Key_PageDown, Key_Semicolon, Key_Q,     Key_J,      Key_K, Key_X, Key_Escape,
-   Key_LeftControl, Key_Backspace, Key_LeftGui, Key_LeftShift,
-   ShiftToLayer(FUNCTION),
+  [MEDIA] = KEYMAP_STACKED
+  (
+       LCTRL(Key_Z) ,LCTRL(Key_X) ,LCTRL(Key_C)     ,LCTRL(Key_V)   ,LCTRL(Key_Y)
+      ,Key_LGui ,Key_LAlt ,Key_LCtrl ,Key_LShift ,___
+      ,___      ,___      ,___          ,___        ,___     ,___
+      ,___      ,___      ,___          ,___        ,___     ,___
 
-   M(MACRO_ANY),   Key_6, Key_7, Key_8, Key_9, Key_0, LockLayer(NUMPAD),
-   Key_Enter,      Key_F, Key_G, Key_C, Key_R, Key_L, Key_Slash,
-                   Key_D, Key_H, Key_T, Key_N, Key_S, Key_Minus,
-   Key_RightAlt,   Key_B, Key_M, Key_W, Key_V, Key_Z, Key_Equals,
-   Key_RightShift, Key_LeftAlt, Key_Spacebar, Key_RightControl,
-   ShiftToLayer(FUNCTION)),
+                     ,___     ,___      ,___     ,___      ,___
+                     ,___     ,C_Prev   ,C_VolDn ,C_VolUp  ,C_Next
+       ,___          ,___     ,___      ,___     ,___      ,___
+       ,C_Stop       ,C_PP    ,C_Mute   ,___     ,___      ,___
+  ),
 
-#elif defined (PRIMARY_KEYMAP_COLEMAK)
+  [NAV] = KEYMAP_STACKED
+  (
+       LCTRL(Key_Z) ,LCTRL(Key_X) ,LCTRL(Key_C)     ,LCTRL(Key_V)   ,LCTRL(Key_Y)
+      ,Key_LGui ,Key_LAlt ,Key_LCtrl ,Key_LShift ,___
+      ,___      ,___      ,___          ,___        ,___     ,___
+      ,___      ,___      ,___          ,___        ,___     ,___
 
-  [PRIMARY] = KEYMAP_STACKED
-  (___,          Key_1, Key_2, Key_3, Key_4, Key_5, Key_LEDEffectNext,
-   Key_Backtick, Key_Q, Key_W, Key_F, Key_P, Key_B, Key_Tab,
-   Key_PageUp,   Key_A, Key_R, Key_S, Key_T, Key_G,
-   Key_PageDown, Key_Z, Key_X, Key_C, Key_D, Key_V, Key_Escape,
-   Key_LeftControl, Key_Backspace, Key_LeftGui, Key_LeftShift,
-   ShiftToLayer(FUNCTION),
+                     ,LCTRL(Key_Y)     ,LCTRL(Key_V)     ,LCTRL(Key_C)     ,LCTRL(Key_X)   ,LCTRL(Key_Z)
+                     ,Key_CapsLock ,Key_LeftArrow,Key_DownArrow,Key_UpArrow,Key_RightArrow
+       ,___          ,Key_Insert   ,Key_Home     ,Key_PageDown ,Key_PageUp ,Key_End
+       ,Key_Enter    ,Key_Backspace,Key_Delete   ,___          ,___        ,___
+   ),
 
-   M(MACRO_ANY),  Key_6, Key_7, Key_8,     Key_9,         Key_0,         LockLayer(NUMPAD),
-   Key_Enter,     Key_J, Key_L, Key_U,     Key_Y,         Key_Semicolon, Key_Equals,
-                  Key_M, Key_N, Key_E,     Key_I,         Key_O,         Key_Quote,
-   Key_RightAlt,  Key_K, Key_H, Key_Comma, Key_Period,    Key_Slash,     Key_Minus,
-   Key_RightShift, Key_LeftAlt, Key_Spacebar, Key_RightControl,
-   ShiftToLayer(FUNCTION)),
+  [MOUSE] = KEYMAP_STACKED
+  (
+       LCTRL(Key_Z) ,LCTRL(Key_X) ,LCTRL(Key_C)     ,LCTRL(Key_V)   ,LCTRL(Key_Y)
+      ,Key_LGui ,Key_LAlt ,Key_LCtrl ,Key_LShift ,___
+      ,___      ,___      ,___          ,___        ,___     ,___
+      ,___      ,___      ,___          ,___        ,___     ,___
 
-#elif defined (PRIMARY_KEYMAP_CUSTOM)
-  // Edit this keymap to make a custom layout
-  [PRIMARY] = KEYMAP_STACKED
-  (___,          Key_1, Key_2, Key_3, Key_4, Key_5, Key_LEDEffectNext,
-   Key_Backtick, Key_Q, Key_W, Key_E, Key_R, Key_T, Key_Tab,
-   Key_PageUp,   Key_A, Key_S, Key_D, Key_F, Key_G,
-   Key_PageDown, Key_Z, Key_X, Key_C, Key_V, Key_B, Key_Escape,
-   Key_LeftControl, Key_Backspace, Key_LeftGui, Key_LeftShift,
-   ShiftToLayer(FUNCTION),
+                     ,LCTRL(Key_Y)     ,LCTRL(Key_V)     ,LCTRL(Key_C)     ,LCTRL(Key_X)   ,LCTRL(Key_Z)
+                     ,___              ,Key_mouseL       ,Key_mouseDn      ,Key_mouseUp    ,Key_mouseR
+       ,___          ,___              ,Key_mouseScrollL ,Key_mouseScrollDn,Key_mouseScrollUp,Key_mouseScrollR
+       ,Key_mouseBtnR,Key_mouseBtnL,Key_mouseBtnM,___          ,___        ,___
+   ),
 
-   M(MACRO_ANY),  Key_6, Key_7, Key_8,     Key_9,         Key_0,         LockLayer(NUMPAD),
-   Key_Enter,     Key_Y, Key_U, Key_I,     Key_O,         Key_P,         Key_Equals,
-                  Key_H, Key_J, Key_K,     Key_L,         Key_Semicolon, Key_Quote,
-   Key_RightAlt,  Key_N, Key_M, Key_Comma, Key_Period,    Key_Slash,     Key_Minus,
-   Key_RightShift, Key_LeftAlt, Key_Spacebar, Key_RightControl,
-   ShiftToLayer(FUNCTION)),
+  [SYMBOL] = KEYMAP_STACKED
+  (
+       LSHIFT(Key_LBracket)  ,LSHIFT(Key_7) ,LSHIFT(Key_8) ,LSHIFT(Key_9) ,LSHIFT(Key_RBracket)
+      ,LSHIFT(Key_Semicolon) ,LSHIFT(Key_4) ,LSHIFT(Key_5) ,LSHIFT(Key_6) ,LSHIFT(Key_Equals)
+      ,LSHIFT(Key_Backtick)  ,LSHIFT(Key_1) ,LSHIFT(Key_2) ,LSHIFT(Key_3) ,LSHIFT(Key_Backslash) ,___
+      ,___                   ,___           ,___           ,Key_LeftParen ,Key_RightParen        ,LSHIFT(Key_Minus)
 
-#else
+                     ,LCTRL(Key_Y)     ,LCTRL(Key_V)     ,LCTRL(Key_C)     ,LCTRL(Key_X)   ,LCTRL(Key_Z)
+                     ,___          ,Key_LShift   ,Key_LCtrl ,Key_LAlt   ,Key_LGui
+       ,___          ,___          ,___          ,___          ,___        ,___
+       ,___          ,___          ,___          ,___          ,___        ,___
+   ),
 
-#error "No default keymap defined. You should make sure that you have a line like '#define PRIMARY_KEYMAP_QWERTY' in your sketch"
+  [NUMBER] = KEYMAP_STACKED
+  (
+       Key_LBracket  ,Key_7 ,Key_8 ,Key_9         ,Key_RBracket
+      ,Key_Semicolon ,Key_4 ,Key_5 ,Key_6         ,Key_Equals
+      ,Key_Backtick  ,Key_1 ,Key_2 ,Key_3         ,Key_Backslash  ,___
+      ,___           ,___   ,___   ,Key_Period    ,Key_0          ,Key_Minus
 
-#endif
+                     ,LCTRL(Key_Y)     ,LCTRL(Key_V)     ,LCTRL(Key_C)     ,LCTRL(Key_X)   ,LCTRL(Key_Z)
+                     ,___          ,Key_LShift   ,Key_LCtrl ,Key_LAlt   ,Key_LGui
+       ,___          ,___          ,___          ,___          ,___        ,___
+       ,___          ,___          ,___          ,___          ,___        ,___
+   ),
 
+  [FUNCTION] = KEYMAP_STACKED
+  (
+       Key_F12  ,Key_F7 ,Key_F8 ,Key_F9         ,Key_PrintScreen
+      ,Key_F11  ,Key_F4 ,Key_F5 ,Key_F6         ,Key_ScrollLock
+      ,Key_F10   ,Key_F1 ,Key_F2 ,Key_F3         ,Key_Pause        ,___
+      ,___      ,___    ,___    ,Key_Esc        ,Key_Space        ,Key_Tab
 
-
-  [NUMPAD] =  KEYMAP_STACKED
-  (___, ___, ___, ___, ___, ___, ___,
-   ___, ___, ___, ___, ___, ___, ___,
-   ___, ___, ___, ___, ___, ___,
-   ___, ___, ___, ___, ___, ___, ___,
-   ___, ___, ___, ___,
-   ___,
-
-   M(MACRO_VERSION_INFO),  ___, Key_7, Key_8,      Key_9,              Key_KeypadSubtract, ___,
-   ___,                    ___, Key_4, Key_5,      Key_6,              Key_KeypadAdd,      ___,
-                           ___, Key_1, Key_2,      Key_3,              Key_Equals,         ___,
-   ___,                    ___, Key_0, Key_Period, Key_KeypadMultiply, Key_KeypadDivide,   Key_Enter,
-   ___, ___, ___, ___,
-   ___),
-
-  [FUNCTION] =  KEYMAP_STACKED
-  (___,      Key_F1,           Key_F2,      Key_F3,     Key_F4,        Key_F5,           Key_CapsLock,
-   Key_Tab,  ___,              Key_mouseUp, ___,        Key_mouseBtnR, Key_mouseWarpEnd, Key_mouseWarpNE,
-   Key_Home, Key_mouseL,       Key_mouseDn, Key_mouseR, Key_mouseBtnL, Key_mouseWarpNW,
-   Key_End,  Key_PrintScreen,  Key_Insert,  ___,        Key_mouseBtnM, Key_mouseWarpSW,  Key_mouseWarpSE,
-   ___, Key_Delete, ___, ___,
-   ___,
-
-   Consumer_ScanPreviousTrack, Key_F6,                 Key_F7,                   Key_F8,                   Key_F9,          Key_F10,          Key_F11,
-   Consumer_PlaySlashPause,    Consumer_ScanNextTrack, Key_LeftCurlyBracket,     Key_RightCurlyBracket,    Key_LeftBracket, Key_RightBracket, Key_F12,
-                               Key_LeftArrow,          Key_DownArrow,            Key_UpArrow,              Key_RightArrow,  ___,              ___,
-   Key_PcApplication,          Consumer_Mute,          Consumer_VolumeDecrement, Consumer_VolumeIncrement, ___,             Key_Backslash,    Key_Pipe,
-   ___, ___, Key_Enter, ___,
-   ___)
+                     ,LCTRL(Key_Y)     ,LCTRL(Key_V)     ,LCTRL(Key_C)     ,LCTRL(Key_X)   ,LCTRL(Key_Z)
+                     ,___          ,Key_LShift   ,Key_LCtrl ,Key_LAlt   ,Key_LGui
+       ,___          ,___          ,___          ,___          ,___        ,___
+       ,___          ,___          ,___          ,___          ,___        ,___
+   )
 ) // KEYMAPS(
 
 /* Re-enable astyle's indent enforcement */
@@ -492,84 +447,6 @@ USE_MAGIC_COMBOS({.action = toggleKeyboardProtocol,
 // The order can be important. For example, LED effects are
 // added in the order they're listed here.
 KALEIDOSCOPE_INIT_PLUGINS(
-  // ----------------------------------------------------------------------
-  // Chrysalis plugins
-
-  // The EEPROMSettings & EEPROMKeymap plugins make it possible to have an
-  // editable keymap in EEPROM.
-  EEPROMSettings,
-  EEPROMKeymap,
-
-  // Focus allows bi-directional communication with the host, and is the
-  // interface through which the keymap in EEPROM can be edited.
-  Focus,
-
-  // FocusSettingsCommand adds a few Focus commands, intended to aid in
-  // changing some settings of the keyboard, such as the default layer (via the
-  // `settings.defaultLayer` command)
-  FocusSettingsCommand,
-
-  // FocusEEPROMCommand adds a set of Focus commands, which are very helpful in
-  // both debugging, and in backing up one's EEPROM contents.
-  FocusEEPROMCommand,
-
-  // The FirmwareVersion plugin lets Chrysalis query the version of the firmware
-  // programmatically.
-  FirmwareVersion,
-
-  // The LayerNames plugin allows Chrysalis to display - and edit - custom layer
-  // names, to be shown instead of the default indexes.
-  LayerNames,
-
-  // Enables setting, saving (via Chrysalis), and restoring (on boot) the
-  // default LED mode.
-  DefaultLEDModeConfig,
-
-  // Enables controlling (and saving) the brightness of the LEDs via Focus.
-  LEDBrightnessConfig,
-
-  // ----------------------------------------------------------------------
-  // Keystroke-handling plugins
-
-  // The Qukeys plugin enables the "Secondary action" functionality in
-  // Chrysalis. Keys with secondary actions will have their primary action
-  // performed when tapped, but the secondary action when held.
-  Qukeys,
-
-  // SpaceCadet can turn your shifts into parens on tap, while keeping them as
-  // Shifts when held. SpaceCadetConfig lets Chrysalis configure some aspects of
-  // the plugin.
-  SpaceCadet,
-  SpaceCadetConfig,
-
-  // Enables the "Sticky" behavior for modifiers, and the "Layer shift when
-  // held" functionality for layer keys.
-  OneShot,
-  OneShotConfig,
-  EscapeOneShot,
-  EscapeOneShotConfig,
-
-  // The macros plugin adds support for macros
-  Macros,
-
-  // Enables dynamic, Chrysalis-editable macros.
-  DynamicMacros,
-
-  // The MouseKeys plugin lets you add keys to your keymap which move the mouse.
-  MouseKeys,
-  MouseKeysConfig,
-
-  // The MagicCombo plugin lets you use key combinations to trigger custom
-  // actions - a bit like Macros, but triggered by pressing multiple keys at the
-  // same time.
-  MagicCombo,
-
-  // Enables the GeminiPR Stenography protocol. Unused by default, but with the
-  // plugin enabled, it becomes configurable - and then usable - via Chrysalis.
-  GeminiPR,
-
-  // ----------------------------------------------------------------------
-  // LED mode plugins
 
   // The boot greeting effect pulses the LED button for 10 seconds after the
   // keyboard is first connected
@@ -624,16 +501,15 @@ KALEIDOSCOPE_INIT_PLUGINS(
   // the factory 'numpad' mode
   ColormapOverlay,
 
+  // The MouseKeys plugin lets you add keys to your keymap which move the mouse.
+  // The MouseKeysConfig plugin lets Chrysalis configure some aspects of the
+  // plugin.
+  MouseKeys,
+  MouseKeysConfig,
+
   // The HostPowerManagement plugin allows us to turn LEDs off when then host
   // goes to sleep, and resume them when it wakes up.
   HostPowerManagement,
-
-  // Turns LEDs off after a configurable amount of idle time.
-  IdleLEDs,
-  PersistentIdleLEDs,
-
-  // ----------------------------------------------------------------------
-  // Miscellaneous plugins
 
   // The USBQuirks plugin lets you do some things with USB that we aren't
   // comfortable - or able - to do automatically, but can be useful
@@ -641,10 +517,43 @@ KALEIDOSCOPE_INIT_PLUGINS(
   // by BIOSes) and Report (NKRO).
   USBQuirks,
 
-  // The hardware test mode, which can be invoked by tapping Prog, LED and the
-  // left Fn button at the same time.
-  HardwareTestMode  //,
-);
+  // The Qukeys plugin enables the "Secondary action" functionality in
+  // Chrysalis. Keys with secondary actions will have their primary action
+  // performed when tapped, but the secondary action when held.
+  Qukeys,
+
+  // Enables the "Sticky" behavior for modifiers, and the "Layer shift when
+  // held" functionality for layer keys.
+  OneShot,
+  OneShotConfig,
+  EscapeOneShot,
+  EscapeOneShotConfig,
+
+  // Turns LEDs off after a configurable amount of idle time.
+  IdleLEDs,
+  PersistentIdleLEDs,
+
+  // Enables dynamic, Chrysalis-editable macros.
+  DynamicMacros,
+
+  // The FirmwareVersion plugin lets Chrysalis query the version of the firmware
+  // programmatically.
+  FirmwareVersion,
+
+  // The LayerNames plugin allows Chrysalis to display - and edit - custom layer
+  // names, to be shown instead of the default indexes.
+  LayerNames,
+
+  // Enables setting, saving (via Chrysalis), and restoring (on boot) the
+  // default LED mode.
+  DefaultLEDModeConfig,
+
+  // Enables controlling (and saving) the brightness of the LEDs via Focus.
+  LEDBrightnessConfig,
+
+  // Enables the GeminiPR Stenography protocol. Unused by default, but with the
+  // plugin enabled, it becomes configurable - and then usable - via Chrysalis.
+  GeminiPR);
 
 /** The 'setup' function is one of the two standard Arduino sketch functions.
  * It's called when your keyboard first powers up. This is where you set up

@@ -1,6 +1,6 @@
 /* -*- mode: c++ -*-
  * Atreus -- Chrysalis-enabled Sketch for the Keyboardio Atreus
- * Copyright (C) 2018-2022  Keyboard.io, Inc
+ * Copyright (C) 2018, 2019  Keyboard.io, Inc
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,18 +22,9 @@
 #endif
 
 #include "Kaleidoscope.h"
-#include "Kaleidoscope-EEPROM-Settings.h"
-#include "Kaleidoscope-EEPROM-Keymap.h"
-#include "Kaleidoscope-Escape-OneShot.h"
-#include "Kaleidoscope-FirmwareVersion.h"
-#include "Kaleidoscope-FocusSerial.h"
-#include "Kaleidoscope-Macros.h"
 #include "Kaleidoscope-MouseKeys.h"
-#include "Kaleidoscope-OneShot.h"
 #include "Kaleidoscope-Qukeys.h"
-#include "Kaleidoscope-SpaceCadet.h"
-#include "Kaleidoscope-DynamicMacros.h"
-#include "Kaleidoscope-LayerNames.h"
+
 
 #define MO(n) ShiftToLayer(n)
 #define TG(n) LockLayer(n)
@@ -43,171 +34,151 @@ enum {
   MACRO_VERSION_INFO
 };
 
-#define Key_Exclamation LSHIFT(Key_1)
+#define Key_Excl        LSHIFT(Key_1)
 #define Key_At          LSHIFT(Key_2)
 #define Key_Hash        LSHIFT(Key_3)
 #define Key_Dollar      LSHIFT(Key_4)
-#define Key_Percent     LSHIFT(Key_5)
+#define Key_Pct         LSHIFT(Key_5)
 #define Key_Caret       LSHIFT(Key_6)
-#define Key_And         LSHIFT(Key_7)
+#define Key_Amp         LSHIFT(Key_7)
 #define Key_Star        LSHIFT(Key_8)
 #define Key_Plus        LSHIFT(Key_Equals)
 
+#define C_Prev Consumer_ScanPreviousTrack
+#define C_Next Consumer_ScanNextTrack
+#define C_VolUp Consumer_VolumeIncrement
+#define C_VolDn Consumer_VolumeDecrement
+#define C_Stop Consumer_Stop
+#define C_PP Consumer_PlaySlashPause
+#define C_Mute Consumer_Mute
+
 enum {
   QWERTY,
-  FUN,
-  UPPER
+  MEDIA,
+  NAV,
+  MOUSE,
+  SYMBOL,
+  NUMBER,
+  FUNCTION
 };
 
 // clang-format off
 KEYMAPS(
   [QWERTY] = KEYMAP_STACKED
   (
-       Key_Q   ,Key_W   ,Key_E       ,Key_R         ,Key_T
-      ,Key_A   ,Key_S   ,Key_D       ,Key_F         ,Key_G
-      ,Key_Z   ,Key_X   ,Key_C       ,Key_V         ,Key_B, Key_Backtick
-      ,Key_Esc ,Key_Tab ,Key_LeftGui ,Key_LeftShift ,Key_Backspace ,Key_LeftControl
-
-                     ,Key_Y     ,Key_U      ,Key_I     ,Key_O      ,Key_P
-                     ,Key_H     ,Key_J      ,Key_K     ,Key_L      ,Key_Semicolon
-       ,Key_Backslash,Key_N     ,Key_M      ,Key_Comma ,Key_Period ,Key_Slash
-       ,Key_LeftAlt  ,Key_Space ,MO(FUN)    ,Key_Minus ,Key_Quote  ,Key_Enter
+       Key_Q        ,Key_W        ,Key_E        ,Key_R                 ,Key_T
+      ,GUI_T(A) ,ALT_T(S) ,CTL_T(D) ,SFT_T(F)          ,Key_G
+      ,Key_Z        ,Key_X        ,Key_C        ,Key_V                 ,Key_B              , ___
+      ,___          ,___          ,___          ,ShiftToLayer(MEDIA)   ,ShiftToLayer(NAV)  ,ShiftToLayer(MOUSE)
+                                
+                              ,Key_Y                     ,Key_U                    ,Key_I        ,Key_O        ,Key_P
+                              ,Key_H                     ,SFT_T(J)             ,CTL_T(K) ,ALT_T(L) ,GUI_T(Quote)
+       ,___                   ,Key_N                     ,Key_M                    ,Key_Comma    ,Key_Period   ,Key_Slash
+       ,ShiftToLayer(SYMBOL)  ,ShiftToLayer(NUMBER)      ,ShiftToLayer(FUNCTION) ,___          ,___          ,___
   ),
 
-  [FUN] = KEYMAP_STACKED
+  [MEDIA] = KEYMAP_STACKED
   (
-       Key_Exclamation ,Key_At           ,Key_UpArrow   ,Key_Dollar           ,Key_Percent
-      ,Key_LeftParen   ,Key_LeftArrow    ,Key_DownArrow ,Key_RightArrow       ,Key_RightParen
-      ,Key_LeftBracket ,Key_RightBracket ,Key_Hash      ,Key_LeftCurlyBracket ,Key_RightCurlyBracket ,Key_Caret
-      ,TG(UPPER)       ,Key_Insert       ,Key_LeftGui   ,Key_LeftShift        ,Key_Delete         ,Key_LeftControl
+       LCTRL(Key_Z) ,LCTRL(Key_X) ,LCTRL(Key_C)     ,LCTRL(Key_V)   ,LCTRL(Key_Y)
+      ,Key_LGui ,Key_LAlt ,Key_LCtrl ,Key_LShift ,___
+      ,___      ,___      ,___          ,___        ,___     ,___
+      ,___      ,___      ,___          ,___        ,___     ,___
 
-                   ,Key_PageUp   ,Key_7 ,Key_8      ,Key_9 ,Key_Backspace
-                   ,Key_PageDown ,Key_4 ,Key_5      ,Key_6 ,___
-      ,Key_And     ,Key_Star     ,Key_1 ,Key_2      ,Key_3 ,Key_Plus
-      ,Key_LeftAlt ,Key_Space    ,___   ,Key_Period ,Key_0 ,Key_Equals
+                     ,___     ,___      ,___     ,___      ,___
+                     ,___     ,C_Prev   ,C_VolDn ,C_VolUp  ,C_Next
+       ,___          ,___     ,___      ,___     ,___      ,___
+       ,C_Stop       ,C_PP    ,C_Mute   ,___     ,___      ,___
+  ),
+
+  [NAV] = KEYMAP_STACKED
+  (
+       LCTRL(Key_Z) ,LCTRL(Key_X) ,LCTRL(Key_C)     ,LCTRL(Key_V)   ,LCTRL(Key_Y)
+      ,Key_LGui ,Key_LAlt ,Key_LCtrl ,Key_LShift ,___
+      ,___      ,___      ,___          ,___        ,___     ,___
+      ,___      ,___      ,___          ,___        ,___     ,___
+
+                     ,LCTRL(Key_Y)     ,LCTRL(Key_V)     ,LCTRL(Key_C)     ,LCTRL(Key_X)   ,LCTRL(Key_Z)
+                     ,Key_CapsLock ,Key_LeftArrow,Key_DownArrow,Key_UpArrow,Key_RightArrow
+       ,___          ,Key_Insert   ,Key_Home     ,Key_PageDown ,Key_PageUp ,Key_End
+       ,Key_Enter    ,Key_Backspace,Key_Delete   ,___          ,___        ,___
    ),
 
-  [UPPER] = KEYMAP_STACKED
+  [MOUSE] = KEYMAP_STACKED
   (
-       Key_Insert            ,Key_Home                 ,Key_UpArrow   ,Key_End        ,Key_PageUp
-      ,Key_Delete            ,Key_LeftArrow            ,Key_DownArrow ,Key_RightArrow ,Key_PageDown
-      ,M(MACRO_VERSION_INFO) ,Consumer_VolumeIncrement ,XXX           ,XXX            ,___ ,___
-      ,MoveToLayer(QWERTY)   ,Consumer_VolumeDecrement ,___           ,___            ,___ ,___
+       LCTRL(Key_Z) ,LCTRL(Key_X) ,LCTRL(Key_C)     ,LCTRL(Key_V)   ,LCTRL(Key_Y)
+      ,Key_LGui ,Key_LAlt ,Key_LCtrl ,Key_LShift ,___
+      ,___      ,___      ,___          ,___        ,___     ,___
+      ,___      ,___      ,___          ,___        ,___     ,___
 
-                ,Key_UpArrow   ,Key_F7              ,Key_F8          ,Key_F9         ,Key_F10
-                ,Key_DownArrow ,Key_F4              ,Key_F5          ,Key_F6         ,Key_F11
-      ,___      ,XXX           ,Key_F1              ,Key_F2          ,Key_F3         ,Key_F12
-      ,___      ,___           ,MoveToLayer(QWERTY) ,Key_PrintScreen ,Key_ScrollLock ,Consumer_PlaySlashPause
+                     ,LCTRL(Key_Y)     ,LCTRL(Key_V)     ,LCTRL(Key_C)     ,LCTRL(Key_X)   ,LCTRL(Key_Z)
+                     ,___              ,Key_mouseL       ,Key_mouseDn      ,Key_mouseUp    ,Key_mouseR
+       ,___          ,___              ,Key_mouseScrollL ,Key_mouseScrollDn,Key_mouseScrollUp,Key_mouseScrollR
+       ,Key_mouseBtnR,Key_mouseBtnL,Key_mouseBtnM,___          ,___        ,___
+   ),
+
+  [SYMBOL] = KEYMAP_STACKED
+  (
+       LSHIFT(Key_LBracket)  ,LSHIFT(Key_7) ,LSHIFT(Key_8) ,LSHIFT(Key_9) ,LSHIFT(Key_RBracket)
+      ,LSHIFT(Key_Semicolon) ,LSHIFT(Key_4) ,LSHIFT(Key_5) ,LSHIFT(Key_6) ,LSHIFT(Key_Equals)
+      ,LSHIFT(Key_Backtick)  ,LSHIFT(Key_1) ,LSHIFT(Key_2) ,LSHIFT(Key_3) ,LSHIFT(Key_Backslash) ,___
+      ,___                   ,___           ,___           ,Key_LeftParen ,Key_RightParen        ,LSHIFT(Key_Minus)
+
+                     ,LCTRL(Key_Y)     ,LCTRL(Key_V)     ,LCTRL(Key_C)     ,LCTRL(Key_X)   ,LCTRL(Key_Z)
+                     ,___          ,Key_LShift   ,Key_LCtrl ,Key_LAlt   ,Key_LGui
+       ,___          ,___          ,___          ,___          ,___        ,___
+       ,___          ,___          ,___          ,___          ,___        ,___
+   ),
+
+  [NUMBER] = KEYMAP_STACKED
+  (
+       Key_LBracket  ,Key_7 ,Key_8 ,Key_9         ,Key_RBracket
+      ,Key_Semicolon ,Key_4 ,Key_5 ,Key_6         ,Key_Equals
+      ,Key_Backtick  ,Key_1 ,Key_2 ,Key_3         ,Key_Backslash  ,___
+      ,___           ,___   ,___   ,Key_Period    ,Key_0          ,Key_Minus
+
+                     ,LCTRL(Key_Y)     ,LCTRL(Key_V)     ,LCTRL(Key_C)     ,LCTRL(Key_X)   ,LCTRL(Key_Z)
+                     ,___          ,Key_LShift   ,Key_LCtrl ,Key_LAlt   ,Key_LGui
+       ,___          ,___          ,___          ,___          ,___        ,___
+       ,___          ,___          ,___          ,___          ,___        ,___
+   ),
+
+  [FUNCTION] = KEYMAP_STACKED
+  (
+       Key_F12  ,Key_F7 ,Key_F8 ,Key_F9         ,Key_PrintScreen
+      ,Key_F11  ,Key_F4 ,Key_F5 ,Key_F6         ,Key_ScrollLock
+      ,Key_F10   ,Key_F1 ,Key_F2 ,Key_F3         ,Key_Pause        ,___
+      ,___      ,___    ,___    ,Key_Esc        ,Key_Space        ,Key_Tab
+
+                     ,LCTRL(Key_Y)     ,LCTRL(Key_V)     ,LCTRL(Key_C)     ,LCTRL(Key_X)   ,LCTRL(Key_Z)
+                     ,___          ,Key_LShift   ,Key_LCtrl ,Key_LAlt   ,Key_LGui
+       ,___          ,___          ,___          ,___          ,___        ,___
+       ,___          ,___          ,___          ,___          ,___        ,___
    )
 )
 // clang-format on
 
 KALEIDOSCOPE_INIT_PLUGINS(
-  // ----------------------------------------------------------------------
-  // Chrysalis plugins
-
-  // The EEPROMSettings & EEPROMKeymap plugins make it possible to have an
-  // editable keymap in EEPROM.
-  EEPROMSettings,
-  EEPROMKeymap,
-
-  // Focus allows bi-directional communication with the host, and is the
-  // interface through which the keymap in EEPROM can be edited.
-  Focus,
-
-  // FocusSettingsCommand adds a few Focus commands, intended to aid in
-  // changing some settings of the keyboard, such as the default layer (via the
-  // `settings.defaultLayer` command)
-  FocusSettingsCommand,
-
-  // FocusEEPROMCommand adds a set of Focus commands, which are very helpful in
-  // both debugging, and in backing up one's EEPROM contents.
-  FocusEEPROMCommand,
-
-  // The FirmwareVersion plugin lets Chrysalis query the version of the firmware
-  // programmatically.
-  FirmwareVersion,
-
-  // The LayerNames plugin allows Chrysalis to display - and edit - custom layer
-  // names, to be shown instead of the default indexes.
-  LayerNames,
-
-  // ----------------------------------------------------------------------
-  // Keystroke-handling plugins
-
-  // The Qukeys plugin enables the "Secondary action" functionality in
-  // Chrysalis. Keys with secondary actions will have their primary action
-  // performed when tapped, but the secondary action when held.
   Qukeys,
-
-  // SpaceCadet can turn your shifts into parens on tap, while keeping them as
-  // Shifts when held. SpaceCadetConfig lets Chrysalis configure some aspects of
-  // the plugin.
-  SpaceCadet,
-  SpaceCadetConfig,
-
-  // Enables the "Sticky" behavior for modifiers, and the "Layer shift when
-  // held" functionality for layer keys.
-  OneShot,
-  OneShotConfig,
-  EscapeOneShot,
-  EscapeOneShotConfig,
-
-  // The macros plugin adds support for macros
-  Macros,
-
-  // Enables dynamic, Chrysalis-editable macros.
-  DynamicMacros,
-
-  // The MouseKeys plugin lets you add keys to your keymap which move the mouse.
-  MouseKeys,
-  MouseKeysConfig  //,
-
-  // The MagicCombo plugin lets you use key combinations to trigger custom
-  // actions - a bit like Macros, but triggered by pressing multiple keys at the
-  // same time.
-  // MagicCombo,
-
-  // Enables the GeminiPR Stenography protocol. Unused by default, but with the
-  // plugin enabled, it becomes configurable - and then usable - via Chrysalis.
-  // GeminiPR,
-);
-
-const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
-  if (keyToggledOn(event.state)) {
-    switch (macro_id) {
-    case MACRO_QWERTY:
-      // This macro is currently unused, but is kept around for compatibility
-      // reasons. We used to use it in place of `MoveToLayer(QWERTY)`, but no
-      // longer do. We keep it so that if someone still has the old layout with
-      // the macro in EEPROM, it will keep working after a firmware update.
-      Layer.move(QWERTY);
-      break;
-    case MACRO_VERSION_INFO:
-      Macros.type(PSTR("Keyboardio Atreus - Kaleidoscope "));
-      Macros.type(PSTR(BUILD_INFORMATION));
-      break;
-    default:
-      break;
-    }
-  }
-  return MACRO_NONE;
-}
+  MouseKeys);
 
 void setup() {
   Kaleidoscope.setup();
-  EEPROMKeymap.setup(9);
+  
+  Qukeys.setOverlapThreshold(80);
+  Qukeys.setMinimumHoldTime(50);
+  Qukeys.setMinimumPriorInterval(75);
+  Qukeys.setMaxIntervalForTapRepeat(0);
 
-  DynamicMacros.reserve_storage(48);
+  QUKEYS(
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(3, 3), Key_Escape),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(3, 4), Key_Space),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(3, 5), Key_Tab),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(3, 6), Key_Enter),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(3, 7), Key_Backspace),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(3, 8), Key_Delete)
+  );
 
-  LayerNames.reserve_storage(63);
-
-  Layer.move(EEPROMSettings.default_layer());
-
-  // To avoid any surprises, SpaceCadet is turned off by default. However, it
-  // can be permanently enabled via Chrysalis, so we should only disable it if
-  // no configuration exists.
-  SpaceCadetConfig.disableSpaceCadetIfUnconfigured();
+  MouseKeys.setWarpGridSize(MOUSE_WARP_GRID_3X3);
 }
 
 void loop() {
