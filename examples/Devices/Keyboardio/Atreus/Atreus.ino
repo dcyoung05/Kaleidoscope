@@ -159,7 +159,8 @@ KEYMAPS(
 
 KALEIDOSCOPE_INIT_PLUGINS(
   Qukeys,
-  MouseKeys);
+  MouseKeys
+);
 
 void setup() {
   Kaleidoscope.setup();

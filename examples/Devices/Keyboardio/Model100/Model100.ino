@@ -218,7 +218,7 @@ KEYMAPS(
       ,___          ,Key_Q        ,Key_W        ,Key_E        ,Key_R        ,Key_T        ,___
       ,___          ,Key_A        ,Key_S        ,Key_D        ,Key_F        ,Key_G
       ,___          ,Key_Z        ,Key_X        ,Key_C        ,Key_V        ,Key_B        ,___
-      ,MO(MEDIA)    ,MO(NAV)      ,MO(MOUSE)    ,Key_LShift
+      ,Key_Escape   ,Key_Space    ,Key_Tab      ,Key_LShift
       ,___
                                 
       
@@ -226,7 +226,7 @@ KEYMAPS(
       ,___          ,Key_Y        ,Key_U        ,Key_I        ,Key_O        ,Key_P        ,___
                     ,Key_H        ,Key_J        ,Key_K        ,Key_L        ,Key_Quote    ,___
       ,___          ,Key_N        ,Key_M        ,Key_Comma    ,Key_Period   ,Key_Slash    ,___
-      ,Key_LShift   ,MO(SYMBOL)   ,MO(NUMBER)   ,MO(FUNCTION) 
+      ,Key_LShift   ,Key_Enter    ,Key_Backspace,Key_Delete 
       ,___
   ),
 
@@ -234,7 +234,7 @@ KEYMAPS(
   (
        ___          ,___          ,___          ,___          ,___          ,___          ,___
       ,___          ,LCTRL(Key_Z) ,LCTRL(Key_X) ,LCTRL(Key_C) ,LCTRL(Key_V) ,LCTRL(Key_Y) ,___        
-      ,___          ,Key_LGui     ,Key_LAlt     ,Key_LCtrl    ,Key_LShift   ,___  
+      ,___          ,OSM(LGui),OSM(LAlt),OSM(LCtrl),OSM(LShift),___  
       ,___          ,___          ,___          ,___          ,___          ,___          ,___
       ,___          ,___          ,___          ,___
       ,___
@@ -252,7 +252,7 @@ KEYMAPS(
   (
        ___          ,___          ,___          ,___          ,___          ,___          ,___
       ,___          ,LCTRL(Key_Z) ,LCTRL(Key_X) ,LCTRL(Key_C) ,LCTRL(Key_V) ,LCTRL(Key_Y) ,___        
-      ,___          ,Key_LGui     ,Key_LAlt     ,Key_LCtrl    ,Key_LShift   ,___  
+      ,___          ,OSM(LGui),OSM(LAlt),OSM(LCtrl),OSM(LShift),___   
       ,___          ,___          ,___          ,___          ,___          ,___          ,___
       ,___          ,___          ,___          ,___
       ,___
@@ -270,7 +270,7 @@ KEYMAPS(
   (
        ___          ,___          ,___          ,___          ,___          ,___          ,___
       ,___          ,LCTRL(Key_Z) ,LCTRL(Key_X) ,LCTRL(Key_C) ,LCTRL(Key_V) ,LCTRL(Key_Y) ,___        
-      ,___          ,Key_LGui     ,Key_LAlt     ,Key_LCtrl    ,Key_LShift   ,___  
+      ,___          ,OSM(LGui),OSM(LAlt),OSM(LCtrl),OSM(LShift),___   
       ,___          ,___          ,___          ,___          ,___          ,___          ,___
       ,___          ,___          ,___          ,___
       ,___
@@ -296,10 +296,10 @@ KEYMAPS(
       
       ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
       ,___          ,LCTRL(Key_Y) ,LCTRL(Key_V) ,LCTRL(Key_C) ,LCTRL(Key_X) ,LCTRL(Key_Z) ,___ 
-                    ,___          ,Key_LShift   ,Key_LCtrl    ,Key_LAlt     ,Key_LGui     ,___
+                    ,___          ,OSM(LShift),OSM(LCtrl),OSM(LAlt),OSM(LGui),___
       ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
       ,___          ,___          ,___          ,___          
-      ,___
+      ,___ 
   ),
 
   [NUMBER] = KEYMAP_STACKED
@@ -314,7 +314,7 @@ KEYMAPS(
       
       ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
       ,___          ,LCTRL(Key_Y) ,LCTRL(Key_V) ,LCTRL(Key_C) ,LCTRL(Key_X) ,LCTRL(Key_Z) ,___ 
-                    ,___          ,Key_LShift   ,Key_LCtrl    ,Key_LAlt     ,Key_LGui     ,___
+                    ,___          ,OSM(LShift),OSM(LCtrl),OSM(LAlt),OSM(LGui),___
       ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
       ,___          ,___          ,___          ,___          
       ,___
@@ -332,7 +332,7 @@ KEYMAPS(
       
       ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
       ,___          ,LCTRL(Key_Y) ,LCTRL(Key_V) ,LCTRL(Key_C) ,LCTRL(Key_X) ,LCTRL(Key_Z) ,___ 
-                    ,___          ,Key_LShift   ,Key_LCtrl    ,Key_LAlt     ,Key_LGui     ,___
+                    ,___          ,OSM(LShift),OSM(LCtrl),OSM(LAlt),OSM(LGui),___
       ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
       ,___          ,___          ,___          ,___          
       ,___
@@ -732,21 +732,16 @@ void setup() {
   Qukeys.setMinimumPriorInterval(20);
 
   QUKEYS(
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(0, 7), Key_Escape),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 7), Key_Space),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 7), Key_Tab),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 8), Key_Enter),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 8), Key_Backspace),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(0, 8), Key_Delete),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 4), Key_LShift),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 3), Key_LCtrl),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 2), Key_LAlt),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 1), Key_LGui),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 11), Key_LShift),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 12), Key_LCtrl),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 13), Key_LAlt),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 14), Key_LGui),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(0, 7), MO(MEDIA)),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 7), MO(NAV)),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 7), MO(MOUSE)),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 8), MO(SYMBOL)),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 8), MO(NUMBER)),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(0, 8), MO(FUNCTION)),
   );
+
+  //OneShot.disableStickabilityForModifiers();
+  OneShot.setDoubleTapTimeout(1);
 }
 
 /** loop is the second of the standard Arduino sketch functions.
