@@ -1,10 +1,15 @@
-// -*- mode: c++ -*-
-/* Kaleidoscope - Firmware for computer input devices
+/* Kaleidoscope-LED-ActiveLayerKeys -- Light up the LEDs based on the keys specified in the active layer
  * Copyright (C) 2017-2020  Bart Nagel
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, version 3.
+ *
+ * Additional Permissions:
+ * As an additional permission under Section 7 of the GNU General Public
+ * License Version 3, you may link this software against a Vendor-provided
+ * Hardware Specific Software Module under the terms of the MCU Vendor
+ * Firmware Library Additional Permission Version 1.0.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -18,6 +23,7 @@
 #include "Kaleidoscope.h"
 #include "Kaleidoscope-LEDControl.h"
 #include "Kaleidoscope-LED-ActiveLayerKeys.h"
+#include "Kaleidoscope-MouseKeys.h"
 
 // clang-format off
 
@@ -47,10 +53,10 @@ KEYMAPS(
    ___, ___, ___, ___,
    ___,
 
-   M(MACRO_VERSION_INFO),  ___, Key_7, Key_8,      Key_9,              Key_KeypadSubtract, ___,
-   ___,                    ___, Key_4, Key_5,      Key_6,              Key_KeypadAdd,      ___,
-                           ___, Key_1, Key_2,      Key_3,              Key_Equals,         ___,
-   ___,                    ___, Key_0, Key_Period, Key_KeypadMultiply, Key_KeypadDivide,   Key_Enter,
+   ___, ___, Key_7, Key_8,      Key_9,              Key_KeypadSubtract, ___,
+   ___, ___, Key_4, Key_5,      Key_6,              Key_KeypadAdd,      ___,
+        ___, Key_1, Key_2,      Key_3,              Key_Equals,         ___,
+   ___, ___, Key_0, Key_Period, Key_KeypadMultiply, Key_KeypadDivide,   Key_Enter,
    ___, ___, ___, ___,
    ___),
 

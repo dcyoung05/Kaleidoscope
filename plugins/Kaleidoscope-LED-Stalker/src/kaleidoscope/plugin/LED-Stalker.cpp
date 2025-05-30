@@ -1,10 +1,15 @@
-/* -*- mode: c++ -*-
- * Kaleidoscope-LED-Stalker -- Stalk keys pressed by lighting up and fading back the LED under them
- * Copyright (C) 2017, 2018  Keyboard.io, Inc
+/* Kaleidoscope-LED-Stalker -- Stalk keys pressed by lighting up and fading back the LED under them
+ * Copyright 2017-2025 Keyboard.io, inc.
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, version 3.
+ *
+ * Additional Permissions:
+ * As an additional permission under Section 7 of the GNU General Public
+ * License Version 3, you may link this software against a Vendor-provided
+ * Hardware Specific Software Module under the terms of the MCU Vendor
+ * Firmware Library Additional Permission Version 1.0.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -89,9 +94,9 @@ cRGB Haunt::compute(uint8_t *step) {
   uint16_t b = (*step * highlight_color_.b) / 255;
 
   cRGB color = CRGB(
-    (uint8_t)(r < 255 ? r : 255),
-    (uint8_t)(g < 255 ? g : 255),
-    (uint8_t)(b < 255 ? b : 255));
+    (r < 255 ? (uint8_t)r : 255),
+    (g < 255 ? (uint8_t)g : 255),
+    (b < 255 ? (uint8_t)b : 255));
 
   if (*step >= 0xf0)
     *step -= 1;

@@ -1,10 +1,16 @@
-/* -*- mode: c++ -*-
- * kaleidoscope::driver::keyscanner::Simple --Straightforward Keyscanner for microcontrollers
- * Copyright (C) 2018-2023  Keyboard.io, Inc
+/* Kaleidoscope - Firmware for computer input devices
+ * Copyright (C) 2018-2025 Keyboard.io, inc.
+ *
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, version 3.
+ *
+ * Additional Permissions:
+ * As an additional permission under Section 7 of the GNU General Public
+ * License Version 3, you may link this software against a Vendor-provided
+ * Hardware Specific Software Module under the terms of the MCU Vendor
+ * Firmware Library Additional Permission Version 1.0.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -68,6 +74,20 @@ class Simple : public kaleidoscope::driver::keyscanner::Base<_KeyScannerProps> {
   static row_state_t matrix_state_[_KeyScannerProps::matrix_rows];
   static uint32_t next_scan_at_;
 
+ protected:
+  // Protected methods for subclasses to modify matrix state
+  void setKeyState(uint8_t row, uint8_t col, bool state) {
+    if (state) {
+      matrix_state_[row].current |= (1UL << col);
+    } else {
+      matrix_state_[row].current &= ~(1UL << col);
+    }
+  }
+
+  bool getKeyState(uint8_t row, uint8_t col) const {
+    return (matrix_state_[row].current & (1UL << col)) != 0;
+  }
+
  public:
   void setup() {
     static_assert(
@@ -106,7 +126,11 @@ class Simple : public kaleidoscope::driver::keyscanner::Base<_KeyScannerProps> {
         }
       }
     }
+    postReadMatrix();
   }
+
+  virtual void postReadMatrix() {}
+
   void scanMatrix() {
     uint32_t current_micros_ = micros();
     if (current_micros_ >= next_scan_at_) {
@@ -114,6 +138,7 @@ class Simple : public kaleidoscope::driver::keyscanner::Base<_KeyScannerProps> {
       readMatrix();
     }
     actOnMatrixScan();
+    updateMatrixScanKeyState();
   }
 
   void __attribute__((optimize(3))) actOnMatrixScan() {
@@ -124,6 +149,11 @@ class Simple : public kaleidoscope::driver::keyscanner::Base<_KeyScannerProps> {
           ThisType::handleKeyswitchEvent(Key_NoKey, typename _KeyScannerProps::KeyAddr(row, col), keyState);
         }
       }
+    }
+  }
+
+  void __attribute__((optimize(3))) updateMatrixScanKeyState() {
+    for (uint8_t row = 0; row < _KeyScannerProps::matrix_rows; row++) {
       matrix_state_[row].previous = matrix_state_[row].current;
     }
   }

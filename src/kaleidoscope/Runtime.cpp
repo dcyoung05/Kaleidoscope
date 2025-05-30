@@ -1,9 +1,15 @@
 /* Kaleidoscope - Firmware for computer input devices
- * Copyright (C) 2013-2021  Keyboard.io, Inc.
+ * Copyright (C) 2013-2025 Keyboard.io, inc.
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, version 3.
+ *
+ * Additional Permissions:
+ * As an additional permission under Section 7 of the GNU General Public
+ * License Version 3, you may link this software against a Vendor-provided
+ * Hardware Specific Software Module under the terms of the MCU Vendor
+ * Firmware Library Additional Permission Version 1.0.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -53,7 +59,7 @@ void Runtime_::setup(void) {
   //
   // TODO(anyone): Figure out a way we can get rid of this, and fix the bug
   // properly.
-  device().serialPort().begin(9600);
+  device().initSerial();
 
   kaleidoscope::sketch_exploration::pluginsExploreSketch();
   kaleidoscope::Hooks::onSetup();
@@ -71,6 +77,7 @@ void Runtime_::loop(void) {
   if (device().pollUSBReset()) {
     device().hid().onUSBReset();
   }
+
   kaleidoscope::Hooks::beforeEachCycle();
 
   // Next, we scan the keyswitches. Any toggle-on or toggle-off events will
@@ -82,7 +89,11 @@ void Runtime_::loop(void) {
   // event is being handled at a time.
   device().scanMatrix();
 
+
   kaleidoscope::Hooks::afterEachCycle();
+
+  // Let the device handle power management between cycles
+  device().betweenCycles();
 }
 
 // ----------------------------------------------------------------------------

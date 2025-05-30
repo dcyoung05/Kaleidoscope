@@ -712,7 +712,7 @@ void setup() {
 
   // The LED Stalker mode has a few effects. The one we like is called
   // 'BlazingTrail'. For details on other options, see
-  // https://github.com/keyboardio/Kaleidoscope/blob/master/docs/plugins/LED-Stalker.md
+  // https://github.com/keyboardio/Kaleidoscope/blob/master/plugins/Kaleidoscope-LED-Stalker/README.md
   StalkerEffect.variant = STALKER(BlazingTrail);
 
   // We need to tell the Colormap plugin how many layers we want to have custom

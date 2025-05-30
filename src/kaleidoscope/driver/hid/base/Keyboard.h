@@ -1,10 +1,15 @@
-// -*- mode: c++ -*-
 /* Kaleidoscope - Firmware for computer input devices
- * Copyright (C) 2013-2019  Keyboard.io, Inc.
+ * Copyright (C) 2013-2025 Keyboard.io, inc.
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, version 3.
+ *
+ * Additional Permissions:
+ * As an additional permission under Section 7 of the GNU General Public
+ * License Version 3, you may link this software against a Vendor-provided
+ * Hardware Specific Software Module under the terms of the MCU Vendor
+ * Firmware Library Additional Permission Version 1.0.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -100,8 +105,43 @@ struct KeyboardProps {
   typedef NoSystemControl SystemControl;
 };
 
+// Abstract interface base class to enable hybrid HID drivers
+class KeyboardItf {
+// Vtables are too big for AVR
+#ifndef ARDUINO_ARCH_AVR
+ public:
+  virtual void setup() = 0;
+
+  virtual void sendReport()                           = 0;
+  virtual void releaseAllKeys()                       = 0;
+  virtual void pressConsumerControl(Key mapped_key)   = 0;
+  virtual void releaseConsumerControl(Key mapped_key) = 0;
+  virtual void pressSystemControl(Key mapped_key)     = 0;
+  virtual void releaseSystemControl(Key mapped_key)   = 0;
+  virtual void pressKey(Key pressed_key)              = 0;
+  virtual void pressModifiers(Key pressed_key)        = 0;
+  virtual void releaseModifiers(Key released_key)     = 0;
+  virtual void clearModifiers()                       = 0;
+  virtual void pressRawKey(Key pressed_key)           = 0;
+  virtual void releaseRawKey(Key released_key)        = 0;
+  virtual void releaseKey(Key released_key)           = 0;
+
+  virtual bool isKeyPressed(Key key)                  = 0;
+  virtual bool isModifierKeyActive(Key modifier_key)  = 0;
+  virtual bool wasModifierKeyActive(Key modifier_key) = 0;
+  virtual bool isAnyModifierKeyActive()               = 0;
+  virtual bool wasAnyModifierKeyActive()              = 0;
+  virtual uint8_t getKeyboardLEDs()                   = 0;
+  virtual uint8_t getProtocol()                       = 0;
+  virtual uint8_t getBootOnly()                       = 0;
+
+  virtual void setBootOnly(uint8_t bootonly) = 0;
+  virtual void onUSBReset()                  = 0;
+#endif
+};
+
 template<typename _Props>
-class Keyboard {
+class Keyboard : public KeyboardItf {
  private:
   typename _Props::BootKeyboard boot_keyboard_;
   typename _Props::ConsumerControl consumer_control_;
