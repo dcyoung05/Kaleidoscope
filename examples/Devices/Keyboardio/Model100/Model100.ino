@@ -151,13 +151,11 @@ enum {
   */
 
 enum {
-  QWERTY,
-  MEDIA,
+  BASE,
   NAV,
-  MOUSE,
-  SYMBOL,
-  NUMBER,
-  FUNCTION
+  NUM,
+  SYM,
+  FUN
 }; // layers
 
 
@@ -212,13 +210,13 @@ enum {
 // clang-format off
 
 KEYMAPS(
-  [QWERTY] = KEYMAP_STACKED
+  [BASE] = KEYMAP_STACKED
   (
        ___          ,___          ,___          ,___          ,___          ,___          ,Key_LedNext
       ,___          ,Key_Q        ,Key_W        ,Key_E        ,Key_R        ,Key_T        ,___
       ,___          ,Key_A        ,Key_S        ,Key_D        ,Key_F        ,Key_G
-      ,___          ,Key_Z        ,Key_X        ,Key_C        ,Key_V        ,Key_B        ,___
-      ,Key_Escape   ,Key_Space    ,Key_Tab      ,Key_LShift
+      ,MO(FUN)      ,Key_Z        ,Key_X        ,Key_C        ,Key_V        ,Key_B        ,___
+      ,MO(NAV)      ,Key_Space    ,Key_Tab      ,___
       ,___
                                 
       
@@ -226,27 +224,10 @@ KEYMAPS(
       ,___          ,Key_Y        ,Key_U        ,Key_I        ,Key_O        ,Key_P        ,___
                     ,Key_H        ,Key_J        ,Key_K        ,Key_L        ,Key_Quote    ,___
       ,___          ,Key_N        ,Key_M        ,Key_Comma    ,Key_Period   ,Key_Slash    ,___
-      ,Key_LShift   ,Key_Enter    ,Key_Backspace,Key_Delete 
+      ,___          ,Key_Enter    ,Key_Backspace,MO(NUM) 
       ,___
   ),
 
-  [MEDIA] = KEYMAP_STACKED
-  (
-       ___          ,___          ,___          ,___          ,___          ,___          ,___
-      ,___          ,LCTRL(Key_Z) ,LCTRL(Key_X) ,LCTRL(Key_C) ,LCTRL(Key_V) ,LCTRL(Key_Y) ,___        
-      ,___          ,OSM(LGui),OSM(LAlt),OSM(LCtrl),OSM(LShift),___  
-      ,___          ,___          ,___          ,___          ,___          ,___          ,___
-      ,___          ,___          ,___          ,___
-      ,___
-                                
-      
-      ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
-      ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
-                    ,___          ,C_Prev       ,C_VolDn      ,C_VolUp      ,C_Next       ,___
-      ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
-      ,___          ,C_Stop       ,C_PP         ,C_Mute       
-      ,___
-  ),
 
   [NAV] = KEYMAP_STACKED
   (
@@ -259,38 +240,38 @@ KEYMAPS(
                                 
       
       ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
-      ,___          ,LCTRL(Key_Y) ,LCTRL(Key_V) ,LCTRL(Key_C) ,LCTRL(Key_X) ,LCTRL(Key_Z) ,___ 
+      ,___          ,Key_Delete   ,Key_Esc      ,___          ,___          ,___         ,___ 
                     ,Key_CapsLock ,Key_LArrow   ,Key_DnArrow  ,Key_UpArrow  ,Key_RArrow   ,___
       ,___          ,Key_Insert   ,Key_Home     ,Key_PageDown ,Key_PageUp   ,Key_End      ,___ 
-      ,___          ,Key_Enter    ,Key_Backspace,Key_Delete   
+      ,___          ,___          ,___          ,MO(SYM)
       ,___
   ),
 
-  [MOUSE] = KEYMAP_STACKED
+  [NUM] = KEYMAP_STACKED
   (
        ___          ,___          ,___          ,___          ,___          ,___          ,___
-      ,___          ,LCTRL(Key_Z) ,LCTRL(Key_X) ,LCTRL(Key_C) ,LCTRL(Key_V) ,LCTRL(Key_Y) ,___        
-      ,___          ,OSM(LGui),OSM(LAlt),OSM(LCtrl),OSM(LShift),___   
-      ,___          ,___          ,___          ,___          ,___          ,___          ,___
-      ,___          ,___          ,___          ,___
+      ,___          ,Key_LBracket ,Key_7        ,Key_8        ,Key_9        ,Key_RBracket ,___        
+      ,___          ,Key_Semicolon,Key_4        ,Key_5        ,Key_6        ,Key_Equals
+      ,___          ,Key_Backtick ,Key_1        ,Key_2        ,Key_3        ,Key_Backslash,___
+      ,MO(SYM)      ,Key_0        ,Key_Minus    ,___
       ,___
                                 
       
       ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
       ,___          ,LCTRL(Key_Y) ,LCTRL(Key_V) ,LCTRL(Key_C) ,LCTRL(Key_X) ,LCTRL(Key_Z) ,___ 
-                    ,___          ,Key_mouseL   ,Key_mouseDn  ,Key_mouseUp  ,Key_mouseR   ,___
-      ,___          ,___          ,Key_mScrL    ,Key_mScrDn   ,Key_mScrUp   ,Key_mScrR    ,___ 
-      ,___          ,Key_mouseBtnR,Key_mouseBtnL,Key_mouseBtnM
+                    ,___          ,OSM(LShift)  ,OSM(LCtrl)   ,OSM(LAlt)    ,OSM(LGui)    ,___
+      ,___          ,___          ,Key_LParen   ,Key_RParen   ,Key_Period   ,Key_UScore   ,___ 
+      ,___          ,___          ,___          ,___          
       ,___
   ),
 
-  [SYMBOL] = KEYMAP_STACKED
+  [SYM] = KEYMAP_STACKED
   (
        ___          ,___          ,___          ,___          ,___          ,___          ,___
       ,___          ,Key_LCurly   ,Key_Amp      ,Key_Star     ,Key_LParen   ,Key_RCurly   ,___        
       ,___          ,Key_Colon    ,Key_Dollar   ,Key_Pct      ,Key_Caret    ,Key_Plus
       ,___          ,Key_Tilde    ,Key_Excl     ,Key_At       ,Key_Hash     ,Key_Pipe     ,___
-      ,Key_LParen   ,Key_RParen   ,Key_UScore   ,___
+      ,___          ,___          ,___          ,___
       ,___
                                 
       
@@ -302,38 +283,20 @@ KEYMAPS(
       ,___ 
   ),
 
-  [NUMBER] = KEYMAP_STACKED
+  [FUN] = KEYMAP_STACKED
   (
        ___          ,___          ,___          ,___          ,___          ,___          ,___
-      ,___          ,Key_LBracket ,Key_7        ,Key_8        ,Key_9        ,Key_RBracket ,___        
-      ,___          ,Key_Semicolon,Key_4        ,Key_5        ,Key_6        ,Key_Equals
-      ,___          ,Key_Backtick ,Key_1        ,Key_2        ,Key_3        ,Key_Backslash,___
-      ,Key_Period   ,Key_0        ,Key_Minus    ,___
+      ,___          ,LCTRL(Key_Z) ,LCTRL(Key_X) ,LCTRL(Key_C) ,LCTRL(Key_V) ,LCTRL(Key_Y) ,___        
+      ,___          ,OSM(LGui),OSM(LAlt),OSM(LCtrl),OSM(LShift),___   
+      ,___          ,___          ,___          ,___          ,___          ,___          ,___
+      ,___          ,___          ,___          ,___
       ,___
                                 
       
       ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
-      ,___          ,LCTRL(Key_Y) ,LCTRL(Key_V) ,LCTRL(Key_C) ,LCTRL(Key_X) ,LCTRL(Key_Z) ,___ 
-                    ,___          ,OSM(LShift),OSM(LCtrl),OSM(LAlt),OSM(LGui),___
-      ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
-      ,___          ,___          ,___          ,___          
-      ,___
-  ),
-
-  [FUNCTION] = KEYMAP_STACKED
-  (
-       ___          ,___          ,___          ,___          ,___          ,___          ,___
-      ,___          ,Key_F12      ,Key_F7       ,Key_F8       ,Key_F9       ,Key_PrScrn   ,___        
-      ,___          ,Key_F11      ,Key_F4       ,Key_F5       ,Key_F6       ,Key_ScrLk 
-      ,___          ,Key_F10      ,Key_F1       ,Key_F2       ,Key_F3       ,Key_Pause    ,___
-      ,Key_Esc      ,Key_Space    ,Key_Tab      ,___
-      ,___
-                                
-      
-      ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
-      ,___          ,LCTRL(Key_Y) ,LCTRL(Key_V) ,LCTRL(Key_C) ,LCTRL(Key_X) ,LCTRL(Key_Z) ,___ 
-                    ,___          ,OSM(LShift),OSM(LCtrl),OSM(LAlt),OSM(LGui),___
-      ,___          ,___          ,___          ,___          ,___          ,___          ,___ 
+      ,___          ,Key_PrScrn   ,Key_F9       ,Key_F8       ,Key_F7       ,Key_F12      ,___ 
+                    ,Key_ScrLk    ,Key_F6       ,Key_F5       ,Key_F4       ,Key_F11      ,___
+      ,___          ,Key_Pause    ,Key_F3       ,Key_F2       ,Key_F1       ,Key_F10      ,___ 
       ,___          ,___          ,___          ,___          
       ,___
   )
@@ -373,91 +336,6 @@ PALETTE(
   RGB_UNSET,
   RGB_RED)  // PALETTE(
 
-/** versionInfoMacro handles the 'firmware version info' macro
- *  When a key bound to the macro is pressed, this macro
- *  prints out the firmware build information as virtual keystrokes
- */
-
-static void versionInfoMacro(uint8_t key_state) {
-  if (keyToggledOn(key_state)) {
-    Macros.type(PSTR("Keyboardio Model 100 - Firmware version "));
-    Macros.type(PSTR(KALEIDOSCOPE_FIRMWARE_VERSION));
-  }
-}
-
-/** anyKeyMacro is used to provide the functionality of the 'Any' key.
- *
- * When the 'any key' macro is toggled on, a random alphanumeric key is
- * selected. While the key is held, the function generates a synthetic
- * keypress event repeating that randomly selected key.
- *
- */
-
-static void anyKeyMacro(KeyEvent &event) {
-  if (keyToggledOn(event.state)) {
-    event.key.setKeyCode(Key_A.getKeyCode() + (uint8_t)(millis() % 36));
-    event.key.setFlags(0);
-  }
-}
-
-
-/** macroAction dispatches keymap events that are tied to a macro
-    to that macro. It takes two uint8_t parameters.
-
-    The first is the macro being called (the entry in the 'enum' earlier in this file).
-    The second is the state of the keyswitch. You can use the keyswitch state to figure out
-    if the key has just been toggled on, is currently pressed or if it's just been released.
-
-    The 'switch' statement should have a 'case' for each entry of the macro enum.
-    Each 'case' statement should call out to a function to handle the macro in question.
-
- */
-
-const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
-  switch (macro_id) {
-
-  case MACRO_VERSION_INFO:
-    versionInfoMacro(event.state);
-    break;
-
-  case MACRO_ANY:
-    anyKeyMacro(event);
-    break;
-  }
-  return MACRO_NONE;
-}
-
-
-// These 'solid' color effect definitions define a rainbow of
-// LED color modes calibrated to draw 500mA or less on the
-// Keyboardio Model 100.
-
-
-/** macroAction dispatches keymap events that are tied to a macro
-    to that macro. It takes two uint8_t parameters.
-
-    The first is the macro being called (the entry in the 'enum' earlier in this file).
-    The second is the state of the keyswitch. You can use the keyswitch state to figure out
-    if the key has just been toggled on, is currently pressed or if it's just been released.
-
-    The 'switch' statement should have a 'case' for each entry of the macro enum.
-    Each 'case' statement should call out to a function to handle the macro in question.
-
- */
-
-const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
-  switch (macro_id) {
-
-  case MACRO_VERSION_INFO:
-    versionInfoMacro(event.state);
-    break;
-
-  case MACRO_ANY:
-    anyKeyMacro(event);
-    break;
-  }
-  return MACRO_NONE;
-}
 
 /** toggleLedsOnSuspendResume toggles the LEDs off when the host goes to sleep,
  * and turns them back on when it wakes up.
@@ -658,50 +536,10 @@ void setup() {
   // First, call Kaleidoscope's internal setup function
   Kaleidoscope.setup();
 
-  // Add colormap overlays for all keys of the numpad. This makes sure that
-  // all keys of the numpad light up once the numpad layer is active.
-  //
-  // The call signature is:
-  // kaleidoscope::plugin::Overlay(<layer>, <key_address>, <palette_index>)
-  //
-  // Key address matrix: https://github.com/keyboardio/Kaleidoscope/blob/master/plugins/Kaleidoscope-Hardware-Keyboardio-Model100/src/kaleidoscope/device/keyboardio/Model100.h#L175-L205
-  //
-  // (0, 0) (0, 1) (0, 2) (0, 3) (0, 4) (0, 5) (0, 6) | (0, 9) (0, 10) (0, 11) (0, 12) (0, 13) (0, 14) (0, 15)
-  // (1, 0) (1, 1) (1, 2) (1, 3) (1, 4) (1, 5) (1, 6) | (1, 9) (1, 10) (1, 11) (1, 12) (1, 13) (1, 14) (1, 15)
-  // (2, 0) (2, 1) (2, 2) (2, 3) (2, 4) (2, 5)        |        (2, 10) (2, 11) (2, 12) (2, 13) (2, 14) (2, 15)
-  // (3, 0) (3, 1) (3, 2) (3, 3) (3, 4) (3, 5) (2, 6) | (2, 9) (3, 10) (3, 11) (3, 12) (3, 13) (3, 14) (3, 15)
-  //                      (0, 7) (1, 7) (2, 7) (3, 7) | (3, 8) (2, 8)  (1, 8)  (0, 8)
-  //                                           (3, 6) | (3, 9)
-  COLORMAP_OVERLAYS(
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(0, 11), 23),  // 7
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(1, 11), 23),  // 4
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(2, 11), 23),  // 1
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(3, 11), 23),  // 0
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(0, 12), 23),  // 8
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(1, 12), 23),  // 5
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(2, 12), 23),  // 2
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(3, 12), 23),  // period
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(0, 13), 23),  // 9
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(1, 13), 23),  // 6
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(2, 13), 23),  // 3
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(3, 13), 23),  // multiply
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(0, 14), 23),  // substract
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(1, 14), 23),  // add
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(2, 14), 23),  // equals
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(3, 14), 23),  // divide
-    kaleidoscope::plugin::Overlay(NUMPAD, KeyAddr(3, 15), 23),  // enter
-    )                                                           // COLORMAP_OVERLAYS(
-
   // Set the hue of the boot greeting effect to something that will result in a
   // nice green color.
   BootGreetingEffect.hue = 85;
 
-<<<<<<< HEAD
-  // We configure the AlphaSquare effect to use RED letters
-  AlphaSquare.color = CRGB(255, 0, 0);
-
-=======
->>>>>>> b1cb8f9a (Imitation Miryoku for M100)
   // Set the rainbow effects to be reasonably bright, but low enough
   // to mitigate audible noise in some environments.
   LEDRainbowEffect.brightness(170);
@@ -725,23 +563,6 @@ void setup() {
   // firmware starts with LED effects off. This avoids over-taxing devices that
   // don't have a lot of power to share with USB devices
   DefaultLEDModeConfig.activateLEDModeIfUnconfigured(&LEDOff);
-
-  Qukeys.setMaxIntervalForTapRepeat(0);
-  Qukeys.setOverlapThreshold(80);
-  Qukeys.setMinimumHoldTime(125);
-  Qukeys.setMinimumPriorInterval(20);
-
-  QUKEYS(
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(0, 7), MO(MEDIA)),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 7), MO(NAV)),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 7), MO(MOUSE)),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(2, 8), MO(SYMBOL)),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 8), MO(NUMBER)),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(0, 8), MO(FUNCTION)),
-  );
-
-  //OneShot.disableStickabilityForModifiers();
-  OneShot.setDoubleTapTimeout(1);
 }
 
 /** loop is the second of the standard Arduino sketch functions.
